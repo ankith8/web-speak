@@ -3,6 +3,7 @@ var app = express();
 var path = require('path');
 var jsonFile = require('jsonfile');
 var bodyParser = require('body-parser');
+var fs = require('fs');
 
 app.use(bodyParser.urlencoded({extended:true}));
 
@@ -15,7 +16,8 @@ app.get('/images',function(req,res){
 });
 
 app.post('/images',function(req,res){
-  jsonfile.writeFileSync(path.join(__dirname,'/data/images.json'),req.body);
+  // jsonfile.writeFileSync(path.join(__dirname,'/data/images.json'),req.body);
+  fs.writeFileSync(path.join(__dirname,'/data/images.json'),JSON.stringify(req.body));
   res.sendStatus(200);
 
 });
@@ -25,7 +27,9 @@ app.get('/settings',function(req,res){
 });
 
 app.post('/settings',function(req,res){
-  jsonfile.writeFileSync(path.join(__dirname,'/data/settings.json'),req.body);
+
+  // jsonfile.writeFileSync(path.join(__dirname,'/data/settings.json'),req.body);
+  fs.writeFileSync(path.join(__dirname,'/data/settings.json'),JSON.stringify(req.body));
   res.sendStatus(200);
 });
 

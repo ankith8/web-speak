@@ -45,3 +45,29 @@ h3 .glyphicon {
   margin-left: 10px;
   vertical-align: 3px;
 }
+
+.settings-row {
+  height: 3.5em;
+  display: flex;
+  align-items: center;
+}
+
+.vertical-offset{
+  margin-top: 25px;
+}
+
+.gallery-button{
+  width: 100%;
+}
+
+label{
+  font-size: 1.25em;
+}
+
+#sampleText{
+  margin-bottom: .75em;
+}
+
+select{
+  color: #000000;
+}

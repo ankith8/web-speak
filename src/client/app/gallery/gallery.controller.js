@@ -4,9 +4,9 @@
   angular.module('app')
     .controller('GalleryController',GalleryController);
 
-  GalleryController.$inject = ['$window','galleryService','$interval','$scope','galleryModalService','speechRecognitionService','$timeout','speechSynthesisService'];
+  GalleryController.$inject = ['$window','galleryService','$interval','$scope','galleryModalService','speechRecognitionService','$timeout','speechSynthesisService','settingsService'];
 
-  function GalleryController($window, galleryService, $interval,$scope,galleryModalService,speechRecognitionService,$timeout,speechSynthesisService){
+  function GalleryController($window, galleryService, $interval,$scope,galleryModalService,speechRecognitionService,$timeout,speechSynthesisService,settingsService){
     var vm = this;
     var recognitionTimeout;
     vm.alert = [];
@@ -29,11 +29,12 @@
 
     function activate(){
       getImages();
+      getSettings();
       recognitionTimeout = $timeout(startSpeechRecognition,3000);
     }
 
     function speakCaption(){
-      speechSynthesisService.speak(vm.album.images[vm.selectedIndex].caption);
+      speechSynthesisService.speak(vm.album.images[vm.selectedIndex].caption,vm.settings);
     }
 
     function setSpeechProperties(){
@@ -61,6 +62,13 @@
       catch(e){
         addAlert('danger',e.message);
       }
+    }
+
+    function getSettings(){
+      settingsService.getSettings()
+        .then(function(response){
+            vm.settings = response.data;
+        });
     }
 
     function editCaption(){
