@@ -4,10 +4,11 @@
   angular.module('app')
     .controller('GalleryController',GalleryController);
 
-  GalleryController.$inject = ['$window','galleryService','$interval','$scope','galleryModalService'];
+  GalleryController.$inject = ['$window','galleryService','$interval','$scope','galleryModalService','speechRecognitionService','$timeout'];
 
-  function GalleryController($window, galleryService, $interval,$scope,galleryModalService){
+  function GalleryController($window, galleryService, $interval,$scope,galleryModalService,speechRecognitionService,$timeout){
     var vm = this;
+    var recognitionTimeout;
     vm.alert = [];
     vm.addAlert = addAlert;
     vm.closeAlert = closeAlert;
@@ -28,6 +29,34 @@
 
     function activate(){
       getImages();
+      recognitionTimeout = $timeout(startSpeechRecognition,3000);
+    }
+
+    function setSpeechProperties(){
+      speechRecognitionService.clearCommands();
+      speechRecognitionService.addCommand("edit caption",editCaption);
+      speechRecognitionService.addCommand("start",startSlideShow);
+      speechRecognitionService.addCommand("stop",stopSlideShow);
+      speechRecognitionService.addCommand("next",next);
+      speechRecognitionService.addCommand("previous",previous);
+
+      speechRecognitionService.setNoMatchCallback(function(transcript){
+        addAlert('danger'," No command found for '"+transcript+"'");
+      });
+      speechRecognitionService.setUnrecognisedCallBack(function(transcript){
+        addAlert('info'," I'm not sure, but i think you said '"+transcript+"'");
+      });
+
+    }
+
+    function startSpeechRecognition(){
+      try{
+        setSpeechProperties();
+        speechRecognitionService.startRecognition();
+      }
+      catch(e){
+        addAlert('danger',e.message);
+      }
     }
 
     function editCaption(){
@@ -42,6 +71,7 @@
         galleryModalService.editCaption(selectedImage.caption)
           .then(
             function(newCaption){
+              setSpeechProperties();
               if(selectedImage.caption !== newCaption){
                 selectedImage.caption = newCaption;
                 galleryService.saveImageData(angular.toJson(vm.album))
@@ -51,7 +81,7 @@
               }
             },
             function(){
-              console.log('Modal Dismissed');
+              setSpeechProperties();
             }
           );
       }
@@ -60,6 +90,8 @@
 
     $scope.$on('$locationChangeStart',function(){
       stopSlideShow();
+      $timeout.cancel(recognitionTimeout);
+      speechRecognitionService.stopRecognition();
     });
 
     var slideShowPromise;
