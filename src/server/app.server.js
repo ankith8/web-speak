@@ -17,6 +17,7 @@ app.get('/images',function(req,res){
 app.post('/images',function(req,res){
   jsonfile.writeFileSync(path.join(__dirname,'/data/images.json'),req.body);
   res.sendStatus(200);
+
 });
 
 app.get('/settings',function(req,res){

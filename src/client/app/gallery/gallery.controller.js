@@ -4,9 +4,9 @@
   angular.module('app')
     .controller('GalleryController',GalleryController);
 
-  GalleryController.$inject = ['$window','galleryService','$interval','$scope','galleryModalService','speechRecognitionService','$timeout'];
+  GalleryController.$inject = ['$window','galleryService','$interval','$scope','galleryModalService','speechRecognitionService','$timeout','speechSynthesisService'];
 
-  function GalleryController($window, galleryService, $interval,$scope,galleryModalService,speechRecognitionService,$timeout){
+  function GalleryController($window, galleryService, $interval,$scope,galleryModalService,speechRecognitionService,$timeout,speechSynthesisService){
     var vm = this;
     var recognitionTimeout;
     vm.alert = [];
@@ -30,6 +30,10 @@
     function activate(){
       getImages();
       recognitionTimeout = $timeout(startSpeechRecognition,3000);
+    }
+
+    function speakCaption(){
+      speechSynthesisService.speak(vm.album.images[vm.selectedIndex].caption);
     }
 
     function setSpeechProperties(){
@@ -74,6 +78,9 @@
               setSpeechProperties();
               if(selectedImage.caption !== newCaption){
                 selectedImage.caption = newCaption;
+
+                speakCaption();
+
                 galleryService.saveImageData(angular.toJson(vm.album))
                   .then(function(){
                     addAlert('success','caption saved');
@@ -144,6 +151,7 @@
     function selectImage(index) {
       $window.scrollTo(0,0);
       vm.selectedIndex = index;
+      speakCaption();
     }
 
     function addAlert(type,msg){

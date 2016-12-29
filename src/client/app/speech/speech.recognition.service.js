@@ -39,6 +39,7 @@
         recogniser.onstart = startHandler;
         recogniser.onend = endHandler;
         recogniser.onresult = resultHandler;
+        recogniser.onerror = errorHandler;
       }
     }
 
@@ -56,6 +57,13 @@
 
     function setUnrecognisedCallBack(callback){
       unRecognisedCallback = callback;
+    }
+
+    function errorHandler(err){
+      if(err.error === 'not-allowed'){
+        autoRestart = false;
+      }
+      console.log(err);
     }
 
     function resultHandler(event){
